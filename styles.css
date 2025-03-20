@@ -24,7 +24,7 @@ body {
     display: block;
 }
 
-#nameInputPage .container {
+.container {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -32,21 +32,16 @@ body {
     min-height: 100vh;
     gap: 20px;
     padding: 20px;
+    padding-bottom: 100px;
 }
 
-h1 {
+h1, h2 {
     font-size: clamp(24px, 5vw, 36px);
     text-align: center;
     margin-bottom: 20px;
 }
 
-h2 {
-    font-size: clamp(20px, 4vw, 30px);
-    text-align: center;
-    margin: 20px 0;
-}
-
-#nameInput {
+input, textarea {
     padding: 12px 20px;
     font-size: clamp(16px, 4vw, 18px);
     border: 2px solid #3498db;
@@ -55,6 +50,11 @@ h2 {
     color: white;
     width: min(90%, 300px);
     -webkit-appearance: none;
+}
+
+textarea {
+    min-height: 100px;
+    resize: vertical;
 }
 
 button {
@@ -78,28 +78,133 @@ button:hover {
     background-color: #2980b9;
 }
 
-#scene-container {
-    width: 100%;
-    height: 100vh;
-    touch-action: none;
-}
-
-.nav-button {
+.button-container {
     position: fixed;
-    bottom: max(20px, env(safe-area-inset-bottom));
-    right: max(20px, env(safe-area-inset-right));
+    top: max(20px, env(safe-area-inset-top));
+    left: 50%;
+    transform: translateX(-50%);
     z-index: 1000;
-    padding: 15px 25px;
+    display: flex;
+    gap: 15px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    background: rgba(26, 26, 26, 0.8);
+    padding: 10px 20px;
+    border-radius: 50px;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    max-width: 90%;
+}
+
+.button-container button {
+    min-width: 100px;
+    white-space: nowrap;
+    font-size: 14px;
+}
+
+/* Feedback Form Styles */
+.feedback-form {
+    background: rgba(44, 62, 80, 0.9);
+    padding: 30px;
+    border-radius: 15px;
+    width: min(90%, 500px);
+    margin: 0 auto;
+    margin-bottom: 80px;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
     font-size: clamp(14px, 3.5vw, 16px);
-    border-radius: 25px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-#collectionPage {
-    padding: 20px;
-    padding-bottom: max(20px, env(safe-area-inset-bottom));
+.rating {
+    display: flex;
+    gap: 10px;
+    font-size: 24px;
 }
 
+.fa-star {
+    cursor: pointer;
+    color: #666;
+    transition: color 0.3s;
+}
+
+.fa-star.active {
+    color: #ffd700;
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.submit-btn {
+    background-color: #2ecc71;
+}
+
+.submit-btn:hover {
+    background-color: #27ae60;
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+    .button-container {
+        padding: 8px 15px;
+        gap: 8px;
+    }
+
+    .button-container button {
+        padding: 8px 12px;
+        min-width: auto;
+        font-size: 13px;
+    }
+
+    .feedback-form {
+        padding: 20px;
+        margin-bottom: 100px;
+    }
+
+    .button-group {
+        flex-direction: column;
+    }
+
+    .button-group button {
+        width: 100%;
+    }
+
+    .profile-image {
+        width: 120px;
+        height: 120px;
+    }
+
+    .creator-name {
+        font-size: 1.3em;
+    }
+
+    .creator-title {
+        font-size: 1em;
+    }
+
+    .social-link {
+        font-size: 20px;
+        padding: 8px;
+    }
+}
+
+/* Collection Styles */
 #nameCollection {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(min(150px, 100%), 1fr));
@@ -107,6 +212,7 @@ button:hover {
     padding: 15px;
     max-width: 1200px;
     margin: 0 auto;
+    margin-bottom: 30px;
 }
 
 .collection-item {
@@ -156,4 +262,144 @@ button:hover {
         padding-left: env(safe-area-inset-left);
         padding-right: env(safe-area-inset-right);
     }
-} 
+}
+
+/* Profile Section Styles */
+.profile-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.profile-image {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #3498db;
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+    margin-bottom: 15px;
+    transition: transform 0.3s ease;
+}
+
+.profile-image:hover {
+    transform: scale(1.05);
+}
+
+.creator-name {
+    font-size: 1.5em;
+    margin: 10px 0 5px;
+    color: #ffffff;
+}
+
+.creator-title {
+    font-size: 1.1em;
+    color: #3498db;
+    margin-bottom: 20px;
+}
+
+/* Social Footer Styles */
+.social-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(26, 26, 26, 0.95);
+    padding: 15px 0;
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
+.social-links {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.social-link {
+    color: #ffffff;
+    font-size: 24px;
+    transition: all 0.3s ease;
+    padding: 10px;
+}
+
+.social-link:hover {
+    color: #3498db;
+    transform: translateY(-3px);
+}
+
+.fa-github:hover {
+    color: #333;
+}
+
+.fa-linkedin:hover {
+    color: #0077b5;
+}
+
+.fa-instagram:hover {
+    color: #e4405f;
+}
+
+/* Safe Area Adjustments */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+    #feedbackPage {
+        padding-bottom: calc(100px + env(safe-area-inset-bottom));
+    }
+    
+    .feedback-form {
+        margin-bottom: calc(80px + env(safe-area-inset-bottom));
+    }
+}
+
+/* Update feedback page specific styles */
+#feedbackPage {
+    min-height: 100vh;
+    padding-bottom: 100px;
+    overflow-y: auto;
+}
+
+#feedbackPage .container {
+    min-height: auto;
+    padding-top: 40px;
+    justify-content: flex-start;
+}
+
+/* Update scene container to prevent button overlap */
+#scene-container {
+    width: 100%;
+    height: 100vh;
+    padding-top: 80px;
+}
+
+/* Safe area adjustments for buttons */
+@supports (padding-top: env(safe-area-inset-top)) {
+    .button-container {
+        top: max(20px, env(safe-area-inset-top));
+    }
+}
+
+#collectionPage .container {
+    min-height: auto;
+    padding-top: 40px;
+    padding-bottom: calc(100px + env(safe-area-inset-bottom));
+}
+
+#collectionPage .feedback-form {
+    margin-top: 30px;
+    margin-bottom: calc(80px + env(safe-area-inset-bottom));
+}
+
+@media (max-width: 768px) {
+    #collectionPage .container {
+        padding-top: 20px;
+    }
+    
+    #collectionPage .feedback-form {
+        padding: 20px;
+        margin-top: 20px;
+        margin-bottom: calc(100px + env(safe-area-inset-bottom));
+    }
+}

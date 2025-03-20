@@ -130,18 +130,54 @@ function showPage(pageId) {
         cancelAnimationFrame(renderer.animation);
         renderer.animation = null;
     }
+
+    // Reset home screen when returning to name input page
+    if (pageId === 'nameInputPage') {
+        document.getElementById('nameInput').value = '';
+        document.getElementById('nameInput').focus();
+        // Reset any form fields if they exist
+        const feedbackForms = document.querySelectorAll('.feedback-form');
+        feedbackForms.forEach(form => {
+            form.reset();
+            const stars = form.querySelectorAll('.rating .fa-star');
+            updateStars(stars, 0);
+        });
+    }
 }
 
-// Event listeners
+// Add this function to check for duplicates
+async function checkNameExists(name) {
+    try {
+        const response = await fetch(`${API_URL}/api/names`);
+        const names = await response.json();
+        return names.find(item => item.name.toLowerCase() === name.toLowerCase());
+    } catch (error) {
+        console.error('Error checking name:', error);
+        return null;
+    }
+}
+
+// Update the submit name event listener
 document.getElementById('submitName').addEventListener('click', async () => {
     const name = document.getElementById('nameInput').value.trim();
     if (name) {
+        const existingName = await checkNameExists(name);
+        if (existingName) {
+            showPage('nameDisplayPage');
+            if (!isInitialized) {
+                init3DScene();
+            }
+            create3DText(existingName.name);
+            document.getElementById('nameInput').value = '';
+            return;
+        }
         await saveName(name);
         showPage('nameDisplayPage');
         if (!isInitialized) {
             init3DScene();
         }
         create3DText(name);
+        document.getElementById('nameInput').value = '';
     }
 });
 
@@ -153,6 +189,107 @@ document.getElementById('showCollection').addEventListener('click', () => {
 document.getElementById('backToDisplay').addEventListener('click', () => {
     showPage('nameDisplayPage');
 });
+
+// Feedback form handling
+let currentRating = 0;
+
+document.getElementById('showFeedback').addEventListener('click', () => {
+    showPage('feedbackPage');
+});
+
+document.getElementById('backToDisplayFromFeedback').addEventListener('click', () => {
+    showPage('nameDisplayPage');
+});
+
+// Star rating functionality
+function initializeRating(formId) {
+    const stars = document.querySelectorAll(`#${formId} .rating .fa-star`);
+    let rating = 0;
+
+    stars.forEach(star => {
+        star.addEventListener('mouseover', function() {
+            const value = this.dataset.rating;
+            updateStars(stars, value);
+        });
+
+        star.addEventListener('click', function() {
+            rating = this.dataset.rating;
+            updateStars(stars, rating);
+        });
+    });
+
+    document.querySelector(`#${formId} .rating`).addEventListener('mouseleave', () => {
+        updateStars(stars, rating);
+    });
+
+    return () => rating;
+}
+
+function updateStars(stars, rating) {
+    stars.forEach(star => {
+        const starRating = star.dataset.rating;
+        if (starRating <= rating) {
+            star.classList.add('active');
+        } else {
+            star.classList.remove('active');
+        }
+    });
+}
+
+// Initialize ratings for both forms
+const getFeedbackRating = initializeRating('feedbackForm');
+const getCollectionFeedbackRating = initializeRating('collectionFeedbackForm');
+
+// Feedback form submission handler
+function handleFeedbackSubmit(e, getRating) {
+    e.preventDefault();
+
+    const rating = getRating();
+    if (!rating) {
+        alert('Please select a rating');
+        return;
+    }
+
+    const form = e.target;
+    const feedbackData = {
+        name: form.querySelector('[id$="feedbackName"]').value,
+        email: form.querySelector('[id$="feedbackEmail"]').value,
+        message: form.querySelector('[id$="feedbackMessage"]').value,
+        rating: rating
+    };
+
+    submitFeedback(feedbackData, form);
+}
+
+async function submitFeedback(feedbackData, form) {
+    try {
+        const response = await fetch(`${API_URL}/api/feedback`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(feedbackData)
+        });
+
+        if (response.ok) {
+            alert('Thank you for your feedback!');
+            form.reset();
+            updateStars(form.querySelectorAll('.rating .fa-star'), 0);
+            if (form.id === 'feedbackForm') {
+                showPage('nameDisplayPage');
+            }
+        } else {
+            throw new Error('Failed to submit feedback');
+        }
+    } catch (error) {
+        console.error('Error submitting feedback:', error);
+        alert('Failed to submit feedback. Please try again.');
+    }
+}
+
+// Add event listeners for both forms
+document.getElementById('feedbackForm').addEventListener('submit', e => handleFeedbackSubmit(e, getFeedbackRating));
+document.getElementById('collectionFeedbackForm').addEventListener('submit', e => handleFeedbackSubmit(e, getCollectionFeedbackRating));
 
 // Handle window resize
 function handleResize() {
@@ -170,11 +307,21 @@ document.getElementById('scene-container').addEventListener('touchmove', functio
     e.preventDefault();
 }, { passive: false });
 
-// Update collection page
+// Update collection page with duplicate removal
 function updateCollection(names) {
+    // Remove duplicates by case-insensitive name
+    const uniqueNames = names.reduce((acc, current) => {
+        const x = acc.find(item => item.name.toLowerCase() === current.name.toLowerCase());
+        if (!x) {
+            return acc.concat([current]);
+        } else {
+            return acc;
+        }
+    }, []);
+
     const container = document.getElementById('nameCollection');
     container.innerHTML = '';
-    names.forEach(nameObj => {
+    uniqueNames.forEach(nameObj => {
         const div = document.createElement('div');
         div.className = 'collection-item';
         div.textContent = nameObj.name;
@@ -189,11 +336,13 @@ function updateCollection(names) {
     });
 }
 
-// Fetch names from MongoDB
+// Fetch names from MongoDB with duplicate removal
 async function fetchNames() {
     try {
         const response = await fetch(`${API_URL}/api/names`);
         const names = await response.json();
+        // Sort by creation date to keep the first occurrence
+        names.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
         updateCollection(names);
     } catch (error) {
         console.error('Error fetching names:', error);
@@ -213,4 +362,13 @@ async function saveName(name) {
     } catch (error) {
         console.error('Error saving name:', error);
     }
-} 
+}
+
+// Add Try Again button event listeners
+document.getElementById('tryAgainFromDisplay').addEventListener('click', () => {
+    showPage('nameInputPage');
+});
+
+document.getElementById('tryAgainFromCollection').addEventListener('click', () => {
+    showPage('nameInputPage');
+}); 
