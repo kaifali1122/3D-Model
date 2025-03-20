@@ -1,0 +1,159 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #1a1a1a;
+    color: #ffffff;
+    overflow-x: hidden;
+    touch-action: manipulation;
+}
+
+.page {
+    display: none;
+    width: 100%;
+    min-height: 100vh;
+    position: relative;
+}
+
+.page.active {
+    display: block;
+}
+
+#nameInputPage .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    gap: 20px;
+    padding: 20px;
+}
+
+h1 {
+    font-size: clamp(24px, 5vw, 36px);
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+h2 {
+    font-size: clamp(20px, 4vw, 30px);
+    text-align: center;
+    margin: 20px 0;
+}
+
+#nameInput {
+    padding: 12px 20px;
+    font-size: clamp(16px, 4vw, 18px);
+    border: 2px solid #3498db;
+    border-radius: 10px;
+    background: transparent;
+    color: white;
+    width: min(90%, 300px);
+    -webkit-appearance: none;
+}
+
+button {
+    padding: 12px 24px;
+    font-size: clamp(14px, 3.5vw, 16px);
+    background-color: #3498db;
+    border: none;
+    border-radius: 10px;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+button:active {
+    transform: scale(0.95);
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+#scene-container {
+    width: 100%;
+    height: 100vh;
+    touch-action: none;
+}
+
+.nav-button {
+    position: fixed;
+    bottom: max(20px, env(safe-area-inset-bottom));
+    right: max(20px, env(safe-area-inset-right));
+    z-index: 1000;
+    padding: 15px 25px;
+    font-size: clamp(14px, 3.5vw, 16px);
+    border-radius: 25px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+#collectionPage {
+    padding: 20px;
+    padding-bottom: max(20px, env(safe-area-inset-bottom));
+}
+
+#nameCollection {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(150px, 100%), 1fr));
+    gap: 15px;
+    padding: 15px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.collection-item {
+    background-color: #2c3e50;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: clamp(14px, 3.5vw, 16px);
+    touch-action: manipulation;
+}
+
+.collection-item:active {
+    transform: scale(0.95);
+}
+
+.collection-item:hover {
+    background-color: #3498db;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Mobile-specific styles */
+@media (max-width: 768px) {
+    .nav-button {
+        bottom: max(30px, env(safe-area-inset-bottom));
+        right: 50%;
+        transform: translateX(50%);
+        width: min(200px, 90%);
+    }
+
+    #nameCollection {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    }
+
+    .collection-item {
+        padding: 12px;
+    }
+}
+
+/* iPhone notch support */
+@supports (padding-top: env(safe-area-inset-top)) {
+    .page {
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+    }
+} 
