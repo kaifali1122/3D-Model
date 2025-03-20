@@ -113,11 +113,11 @@ function create3DText(text) {
 
 // Animation loop
 function animate() {
-    renderer.animation = requestAnimationFrame(animate);
     if (controls) {
         controls.update();
     }
     renderer.render(scene, camera);
+    renderer.animation = requestAnimationFrame(animate);
 }
 
 // Page navigation with cleanup
@@ -125,8 +125,12 @@ function showPage(pageId) {
     document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
     document.getElementById(pageId).classList.add('active');
     
-    // Clean up 3D scene when not visible
-    if (pageId !== 'nameDisplayPage' && renderer?.animation) {
+    // Handle 3D scene visibility and animation
+    if (pageId === 'nameDisplayPage') {
+        if (renderer && !renderer.animation && scene && textMesh) {
+            animate(); // Restart animation when returning to display page
+        }
+    } else if (renderer?.animation) {
         cancelAnimationFrame(renderer.animation);
         renderer.animation = null;
     }
@@ -188,6 +192,9 @@ document.getElementById('showCollection').addEventListener('click', () => {
 
 document.getElementById('backToDisplay').addEventListener('click', () => {
     showPage('nameDisplayPage');
+    if (renderer && !renderer.animation && scene && textMesh) {
+        animate(); // Ensure animation restarts when returning via back button
+    }
 });
 
 // Feedback form handling
@@ -309,19 +316,9 @@ document.getElementById('scene-container').addEventListener('touchmove', functio
 
 // Update collection page with duplicate removal
 function updateCollection(names) {
-    // Remove duplicates by case-insensitive name
-    const uniqueNames = names.reduce((acc, current) => {
-        const x = acc.find(item => item.name.toLowerCase() === current.name.toLowerCase());
-        if (!x) {
-            return acc.concat([current]);
-        } else {
-            return acc;
-        }
-    }, []);
-
     const container = document.getElementById('nameCollection');
     container.innerHTML = '';
-    uniqueNames.forEach(nameObj => {
+    names.forEach(nameObj => {
         const div = document.createElement('div');
         div.className = 'collection-item';
         div.textContent = nameObj.name;
